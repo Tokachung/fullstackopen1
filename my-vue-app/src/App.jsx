@@ -28,15 +28,12 @@ const App = () => {
     copy[selected] += 1
     console.log('copy is:', copy)
     setVotes(copy)
-    returnMostVoted(copy)
-    // console.log('most voted is', mostVoted)
-    // console.log('votes is', votes)
-    // console.log('votes most voted is', votes[mostVoted])
+    computeMostVoted(copy)
   }
 
-  function returnMostVoted(copy) {
+  function computeMostVoted(copy) {
 
-    var values = Object.values(copy)
+    let values = Object.values(copy)
     console.log('values array is', values)
     let maxVotes = values[0]
     let maxVotesIndex = 0

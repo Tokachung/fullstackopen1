@@ -13,10 +13,11 @@ const Statistics = (props) => {
 
   if (!props.goodCount && !props.neutralCount && !props.badCount) {
     return (
-    <>
-    <h3>statistics</h3>
-    <p>No feedback given</p>
-    </>)
+      <>
+        <h3>statistics</h3>
+        <p>No feedback given</p>
+      </>
+    )
   }
 
   return (<>
