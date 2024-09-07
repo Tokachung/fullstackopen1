@@ -1,0 +1,48 @@
+import { useState } from 'react'
+
+const App = () => {
+
+    // useState hook to hold the application state, which contains counter
+    const [ counter, setCounter ] = useState(0)
+    const increaseByOne = () => { console.log('increasing, value before', counter) 
+        setCounter(counter + 1) 
+    }
+    const decreaseByOne = () => { console.log('decreasing, value before', counter)
+        setCounter(counter - 1) 
+    }
+    const setToZero = () => { console.log('resetting to zero, value before', counter)
+        setCounter(0) 
+    }
+
+    // Creating a component which displays the counter's value
+    const Display = ({ counter }) => {
+        <div>{counter}</div>
+    }
+
+    // Creating a button component to handle the increase and decrease methods.
+    // We can parse through a method as a prop and use the prop's implementation
+    // of the onClick
+    // When we use the implicit return, do not use curly braces
+    const Button = ({ text, onClick }) => <button onClick={onClick}>{text}</button>
+
+    // Any changes to the counter state, or any other state (in this case there aren't any)
+    // will result in a re-render
+    console.log('rendering...', counter)
+
+    // The reason that our onClick does not need a () is because if we had ()
+    // It would be executed on the render. 
+
+    // When you pass a function to an onClick, it sets up an event listener.
+    // When the user clicks the button, the event listener calls the function.
+    return (
+        <div>
+            <Display counter={counter}/>
+            <div>{counter}</div>
+            <Button onClick={increaseByOne} text="plus" />
+            <Button onClick={decreaseByOne} text="minus" />
+            <button onClick={setToZero}>zero</button>
+        </div>
+    )
+}
+
+export default App
