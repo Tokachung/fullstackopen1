@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import Note from './components/Note'
-import axios from 'axios'
 import noteService from './services/notes'
-
 
 // Now instead of giving notes as a prop from main, we are defining it within app as an axios call.
 const App = () => {
