@@ -1,8 +1,11 @@
 const express = require('express') // Using express instead of http
 const app = express() // Creating an express app
+const cors = require('cors')
 
 // Use json parser to access data
 app.use(express.json())
+app.use(cors())
+app.use(express.static('dist'))
 
 let notes = [
     {
@@ -84,7 +87,7 @@ app.delete('/api/notes/:id', (req, res) => {
   res.status(204).end()
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
