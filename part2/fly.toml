@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for part2-broken-snow-9139 on 2024-09-11T17:41:53+12:00
+# fly.toml app configuration file generated for part2-proud-dust-9827 on 2024-09-12T11:22:53+12:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'part2-broken-snow-9139'
+app = 'part2-proud-dust-9827'
 primary_region = 'syd'
 
 [build]

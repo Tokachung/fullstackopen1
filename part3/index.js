@@ -87,8 +87,8 @@ app.delete('/api/notes/:id', (req, res) => {
   res.status(204).end()
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000 
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
-}) // This is a different listen from the one in http. This is an express method
+})
