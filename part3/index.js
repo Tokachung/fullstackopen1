@@ -1,59 +1,35 @@
 const express = require('express') // Using express instead of http
 const app = express() // Creating an express app
 const cors = require('cors')
+const Note = require('./models/note') // Import the Note model from the note.js file
 
 // Use json parser to access data
 app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-let notes = [
-    {
-      id: "1",
-      content: "HTML is easy",
-      important: true
-    },
-    {
-      id: "2",
-      content: "Browser can execute only JavaScript",
-      important: false
-    },
-    {
-      id: "3",
-      content: "GET and POST are the most important methods of HTTP protocol",
-      important: true
-    }
-]
+require('dotenv').config()
 
-// Make a function to generate the id for the new note in the post request
-const generateId = () => {
-  const maxId = notes.length > 0
-  ? Math.max(...notes.map(n => Number(n.id))): 0
-  return String(maxId + 1) // Return the maximum id + 1 as a string
-}
+const PORT = process.env.PORT
 
 // Make a post request to the /api/notes route
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (request, response) => {
+  const body = request.body
 
-  // Set the content of the note to the content of the request body
-  const body = req.body
-
-  if (!body.content) {
-    return res.status(400).json({
+  if (body.content == undefined) {
+    return response.status(400).json({
       error: 'content missing'
     })
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
     important: Boolean(body.important) || false, // If the important field is missing, the important field will be set to false
-    id: generateId()
-  }
+  })
 
-  notes = notes.concat(note) // Add the new note to the notes array
-
-  res.json(note) // Send the new note as a response
-  console.log(note) // Log the new note to the console
+  note.save().then(savedNote => {
+    response.json(savedNote)
+  })
 })
 
 // The code below defines two routes for the app. Thie first one defines an event handler to handle HTTP GET request made to the root.
@@ -64,31 +40,44 @@ app.get('/', (req, res) => {
     res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/notes', (req, res) => {
-    res.json(notes)
+app.get('/api/notes', (request, response) => {
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
 })
 
-// The colon syntax means that we will handle all requests that match the route /api/notes/:id
-app.get('/api/notes/:id', (req, res) => {
-  const id = req.params.id
-  const note = notes.find(note => note.id === id)
-
-  if (note) {
-    res.json(note)
-  } else {
-    res.status(404).end()
-  }
+// Using Mongoose findById method
+app.get('/api/notes/:id', (request, response) => {
+  Note.findById(request.params.id).then(note => {
+    response.json(note)
+  })
 })
 
-app.delete('/api/notes/:id', (req, res) => {
-  const id = req.params.id
-  notes = notes.filter(note => note.id !== id)
-
-  res.status(204).end()
+// Using Mongoose findById method to delete a note
+app.delete('/api/notes/:id', (request, response, next) => {
+  Note.findByIdAndDelete(request.params.id).then(result => {
+    response.status(204).end() // Send a 204 status code if the note is deleted
+    console.log('Deleted')
+  })
+  .catch(error => next(error)) // If there is an error, pass it to the error handler
 })
-
-const PORT = process.env.PORT || 3000 
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
+})
+
+// Create a PUT request to update the important field of a note
+app.put('/api/notes/:id', (request, response, next) => {
+  const body = request.body // Get the body of the request
+
+  const note = {
+    content: body.content,
+    important: body.important
+  }
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true})
+    .then(updatedNote => {
+      response.json(updatedNote)
+    })
+    .catch(error => next(error))
 })
