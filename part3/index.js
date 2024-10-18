@@ -8,6 +8,8 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
+
+
 require('dotenv').config()
 
 const PORT = process.env.PORT
@@ -47,10 +49,17 @@ app.get('/api/notes', (request, response) => {
 })
 
 // Using Mongoose findById method
-app.get('/api/notes/:id', (request, response) => {
-  Note.findById(request.params.id).then(note => {
-    response.json(note)
+// If no matching object is found, the value of note will be null.
+app.get('/api/notes/:id', (request, response, next) => {
+  Note.findById(request.params.id)
+    .then(note => {
+      if (note) {
+        response.json(note)
+      } else {
+        response.status(404).end()
+      }
   })
+  .catch(error => next(error))
 })
 
 // Using Mongoose findById method to delete a note
@@ -81,3 +90,6 @@ app.put('/api/notes/:id', (request, response, next) => {
     })
     .catch(error => next(error))
 })
+
+
+// Now that everything is set up, we can start placing the error handling middleware at the end of the file.
