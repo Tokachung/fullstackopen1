@@ -8,14 +8,12 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-
-
 require('dotenv').config()
 
 const PORT = process.env.PORT
 
 // Make a post request to the /api/notes route
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
   const body = request.body
 
   if (body.content == undefined) {
@@ -32,6 +30,7 @@ app.post('/api/notes', (request, response) => {
   note.save().then(savedNote => {
     response.json(savedNote)
   })
+  .catch(error => next(error))
 })
 
 // The code below defines two routes for the app. Thie first one defines an event handler to handle HTTP GET request made to the root.
@@ -77,20 +76,34 @@ app.listen(PORT, () => {
 
 // Create a PUT request to update the important field of a note
 app.put('/api/notes/:id', (request, response, next) => {
+  
+  const { content, important } = request.body
+  
   const body = request.body // Get the body of the request
 
-  const note = {
-    content: body.content,
-    important: body.important
-  }
-
-  Note.findByIdAndUpdate(request.params.id, note, { new: true})
+  Note.findByIdAndUpdate(
+    request.params.id, 
+    { content, important }, 
+    { new: true, runValidators: true, context: 'query'}
+  )
     .then(updatedNote => {
       response.json(updatedNote)
     })
     .catch(error => next(error))
 })
 
-
-
 // Now that everything is set up, we can start placing the error handling middleware at the end of the file.
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+

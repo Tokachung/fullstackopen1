@@ -17,9 +17,12 @@ mongoose.connect(url)
         console.log('error connecting to MongoDB:', error.message)
     })
 
-// Now we want to define the new note schema
 const noteSchema = new mongoose.Schema({
-    content: String,
+    content: {
+        type: String,
+        minLength: 5,
+        required: true
+    },
     important: Boolean
 })
 
