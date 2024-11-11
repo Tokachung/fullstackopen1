@@ -10,13 +10,14 @@ app.use(express.static('dist'))
 
 require('dotenv').config()
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3000
+const HOST = '0.0.0.0'
 
 // Make a post request to the /api/notes route
 app.post('/api/notes', (request, response, next) => {
   const body = request.body
 
-  if (body.content == undefined) {
+  if (body.content === undefined) {
     return response.status(400).json({
       error: 'content missing'
     })
@@ -30,7 +31,7 @@ app.post('/api/notes', (request, response, next) => {
   note.save().then(savedNote => {
     response.json(savedNote)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 // The code below defines two routes for the app. Thie first one defines an event handler to handle HTTP GET request made to the root.
@@ -38,7 +39,7 @@ app.post('/api/notes', (request, response, next) => {
 
 // When we call the get method, we pass two parameters to it. The first parameter is the route, and the second parameter is the event handler function.
 app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>')
+  res.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/notes', (request, response) => {
@@ -57,34 +58,32 @@ app.get('/api/notes/:id', (request, response, next) => {
       } else {
         response.status(404).end()
       }
-  })
-  .catch(error => next(error))
+    })
+    .catch(error => next(error))
 })
 
 // Using Mongoose findById method to delete a note
 app.delete('/api/notes/:id', (request, response, next) => {
-  Note.findByIdAndDelete(request.params.id).then(result => {
+  Note.findByIdAndDelete(request.params.id).then(() => {
     response.status(204).end() // Send a 204 status code if the note is deleted
     console.log('Deleted')
   })
-  .catch(error => next(error)) // If there is an error, pass it to the error handler
+    .catch(error => next(error)) // If there is an error, pass it to the error handler
 })
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on port ${PORT} and host ${HOST}`)
 })
 
 // Create a PUT request to update the important field of a note
 app.put('/api/notes/:id', (request, response, next) => {
-  
+
   const { content, important } = request.body
-  
-  const body = request.body // Get the body of the request
 
   Note.findByIdAndUpdate(
-    request.params.id, 
-    { content, important }, 
-    { new: true, runValidators: true, context: 'query'}
+    request.params.id,
+    { content, important },
+    { new: true, runValidators: true, context: 'query' }
   )
     .then(updatedNote => {
       response.json(updatedNote)
