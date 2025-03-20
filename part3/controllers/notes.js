@@ -2,7 +2,7 @@ const notesRouter = require('express').Router()
 const Note = require('../models/note')
 
 // First two routers use modern standard of async/await
-notesRouter.get('/', async (request, response) => {
+notesRouter.get('/', async (request, response, next) => {
   const notes = await Note.find({})
   response.json(notes)
 })
