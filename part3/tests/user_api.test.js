@@ -14,7 +14,7 @@ describe('when there is already one user in the db', () => {
     beforeEach(async () => {
         await User.deleteMany({})
     
-        const passwordHash = await bcrypt.hash('sekret', 10)
+        const passwordHash = await bcrypt.hash('password', 10)
         const user = new User({ username: 'root', passwordHash })
     
         await user.save()
@@ -59,7 +59,6 @@ describe('when there is already one user in the db', () => {
 })
 
 after(async () => {
-    await User.deleteMany({})
     await mongoose.connection.close()
 })
 
