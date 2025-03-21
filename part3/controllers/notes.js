@@ -1,9 +1,11 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
+const User = require('../models/user')
 
 // First two routers use modern standard of async/await
 notesRouter.get('/', async (request, response, next) => {
-  const notes = await Note.find({})
+  const notes = await Note.find({}).populate('user', { username: 1, name: 1})
+  
   response.json(notes)
 })
 
@@ -21,13 +23,23 @@ notesRouter.get('/:id', async (request, response, next) => {
 notesRouter.post('/', async (request, response, next) => {
   const body = request.body
 
+  const user = await User.findById(body.userId)
+
   const note = new Note({
     content: body.content,
     important: body.important || false,
+    user: user.id 
   })
-  const savedNote = await note.save()
-  response.status(201).json(savedNote)
+
+  const savedNote = await note.save() // Retrieving the raw mongodb document
+  console.log('saved note is', savedNote)
+  
+  user.notes = user.notes.concat(savedNote._id)
+  await user.save()
+
+  response.status(201).json(savedNote) // toJSON transformation is applied 
 })
+
 
 notesRouter.delete('/:id', async (request, response, next) => {
 
@@ -35,7 +47,7 @@ notesRouter.delete('/:id', async (request, response, next) => {
   response.status(204).end()
 })
 
-notesRouter.put('/:id', (request, response, next) => {
+notesRouter.put('/:id', async (request, response, next) => {
   const body = request.body
 
   const note = {
@@ -43,11 +55,8 @@ notesRouter.put('/:id', (request, response, next) => {
     important: body.important,
   }
 
-  Note.findByIdAndUpdate(request.params.id, note, { new: true })
-    .then(updatedNote => {
-      response.json(updatedNote)
-    })
-    .catch(error => next(error))
+  const updatedNote = await Note.findByIdAndUpdate(request.params.id, note, { new: true })
+  response.json(updatedBlog)
 })
 
 module.exports = notesRouter

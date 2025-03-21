@@ -31,8 +31,6 @@ describe('when there is already one user in the db', () => {
             password: 'MarvelRivals123!'
         }
 
-        console.log('New User', newUser)
-
         await api.post('/api/users').send(newUser).expect(201).expect('Content-Type', /application\/json/)
 
         usersAtEnd = await helper.usersInDb()
@@ -51,18 +49,17 @@ describe('when there is already one user in the db', () => {
             user: 'Amelia Smith',
             password: 'password1'
         }
-
-        console.log('New User', newUser)
-
-        await api.post('/api/users').send(newUser).expect(400).expect('Content-Type', /application\/json/)
+        const result = await api.post('/api/users').send(newUser).expect(400).expect('Content-Type', /application\/json/)
 
         usersAtEnd = await helper.usersInDb()
+        assert(result.body.error.includes('expected `username` to be unique'))
 
         assert.strictEqual(usersAtStart.length, usersAtEnd.length)
     })
 })
 
 after(async () => {
+    await User.deleteMany({})
     await mongoose.connection.close()
 })
 

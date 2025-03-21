@@ -13,6 +13,7 @@ const noteSchema = new mongoose.Schema({
   }
 })
 
+// Note that the code below only converts an object when it's sent in an API response.
 noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()

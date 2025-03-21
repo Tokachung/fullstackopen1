@@ -14,6 +14,7 @@ usersRouter.post('/', async (request, response, next) => {
         })
     
         const savedUser = await user.save()
+
         response.status(201).json(savedUser)
     } catch (error) {
         // Check for MongoDB duplicate key error (E11000)
@@ -48,7 +49,7 @@ usersRouter.post('/', async (request, response, next) => {
 
 
 usersRouter.get('/', async (request, response, next) => {
-    const users = await User.find({})
+    const users = await User.find({}).populate('notes')
     response.json(users)
 })
 

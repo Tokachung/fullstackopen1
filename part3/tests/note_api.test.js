@@ -30,7 +30,6 @@ test('there are two notes', async () => {
 
 test('the first note is about HTTP methods', async () => {
     const response = await api.get('/api/notes')
-    console.log(response)
   
     const contents = response.body.map(e => e.content)
     assert(contents.includes('HTML is easy'))
@@ -39,7 +38,6 @@ test('the first note is about HTTP methods', async () => {
 test('a valid note can be added', async () => {
 
     const notesAtStart = await helper.notesInDb()
-    console.log('notesAtStartLength', notesAtStart.length)
 
     content_string = 'async/await simplifies making async calls'
     const newNote = {
