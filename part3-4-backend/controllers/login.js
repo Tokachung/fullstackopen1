@@ -6,6 +6,8 @@ const User = require('../models/user')
 loginRouter.post('/', async (request, response) => {
     const { username, password } = request.body
 
+    console.log('secret is', process.env.SECRET)
+
     const user = await User.findOne({ username }) // Search for user from database
     const passwordCorrect = user === null ? false : await bcrypt.compare(password, user.passwordHash) // Check the password against password hash
 
@@ -15,9 +17,12 @@ loginRouter.post('/', async (request, response) => {
         })
     }
 
+    console.log('user is', user)
+
     const userForToken = {
         username: user.username,
-        id: user._id
+        id: user._id,
+        name: user.name
     }
 
     // Set an expiry for the token of 3600 seconds (1 hour)
@@ -25,8 +30,10 @@ loginRouter.post('/', async (request, response) => {
         userForToken,
         process.env.SECRET,
         { expiresIn: 60*60 }
-
     )
+
+    console.log('token is', token)
+    console.log('user for token is', userForToken)
     
     response.status(200).send({ token, username: user.username, name: user.name })
 
