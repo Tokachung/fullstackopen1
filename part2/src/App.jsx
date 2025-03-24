@@ -16,7 +16,7 @@ const App = () => {
   const [user, setUser] = useState(null) // This is the user object once returned from the db
   const [errorMessage, setErrorMessage] = useState(null) // This is to hold the error message
 
-  // Create a helper function to genereate the form
+  // Create a helper function to generate the form
   const loginForm = () => {
     return (
     <form onSubmit={handleLogin}>

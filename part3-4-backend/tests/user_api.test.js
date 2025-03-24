@@ -15,7 +15,7 @@ describe('when there is already one user in the db', () => {
         await User.deleteMany({})
     
         const passwordHash = await bcrypt.hash('password', 10)
-        const user = new User({ username: 'root', passwordHash })
+        const user = new User({ username: 'root', passwordHash , name: 'root user'})
     
         await user.save()
     })
