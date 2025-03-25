@@ -5,6 +5,9 @@ import noteService from './services/notes'
 import './index.css'
 import loginService from './services/login'
 import Footer from './components/Footer'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+import NoteForm from './components/NoteForm'
 
 // Now instead of giving notes as a prop from main, we are defining it within app as an axios call.
 const App = () => {
@@ -15,71 +18,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null) // This is the user object once returned from the db
   const [errorMessage, setErrorMessage] = useState(null) // This is to hold the error message
-
-  // Create a helper function to generate the form
-  const loginForm = () => {
-    return (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-    );
-  }
-
-  const noteForm = () => {
-    return (
-    <form onSubmit={addNote}>
-      <input value={newNote} onChange={handleNoteChange}/>
-      <button type="submit">save</button>
-    </form>
-    );
-  }
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
-    // Attempt to log in the user by sending credentials to the backend via the login service
-    try {
-      const user = await loginService.login({
-        username, password
-      })
-      
-      window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(user)
-      )
-
-      // After successful login, store the valid JWT token in noteService for authenticated requests
-      noteService.setToken(user.token) 
-      
-      setUser(user) // Update the application's user state
-
-      // Clear the fields in the login table
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
   
   useEffect(() => {
     noteService
@@ -93,7 +31,8 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    let loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    loggedUserJSON = null
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
@@ -101,8 +40,67 @@ const App = () => {
     }
   }, [])
 
-  const toggleImportanceOf = (id) => {
+  // Login related
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    try {
+      const user = await loginService.login({
+        username, password
+      })
+      
+      window.localStorage.setItem(
+        'loggedNoteappUser', JSON.stringify(user)
+      )
+      noteService.setToken(user.token) 
+      
+      setUser(user) 
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
 
+  const loginForm = () => {
+    return (
+      <div>
+        <Togglable buttonLabel='login' >
+          <LoginForm
+              username={username}
+              password={password}
+              handleUsernameChange={({ target }) => setUsername(target.value)}
+              handlePasswordChange={({ target }) => setPassword(target.value)}
+              handleSubmit={handleLogin}
+            />
+      
+        </Togglable>
+      </div>
+    )
+  }
+  
+  // Adding a note new note and display new notes.
+  const addNote = (noteObject) => {
+    noteService
+      .create(noteObject)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+      })    
+  }
+  
+  const noteForm = () => {
+    return(
+      <div>
+        <Togglable buttonLabel='new note'>
+          <NoteForm createNote={addNote} />
+        </Togglable>
+      </div>
+    )
+  }
+
+  const toggleImportanceOf = (id) => {
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important}
 
@@ -121,28 +119,6 @@ const App = () => {
   }
 
   const notesToShow = showAll ? notes : notes.filter(note => note.important)
-  
-  const addNote = (event) => {
-    event.preventDefault()
-
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5,
-      id: String(notes.length + 1)
-    }
-
-    noteService
-      .create(noteObject)
-      .then(returnedNote => {
-        setNotes(notes.concat(returnedNote))
-        setNewNote('')
-      })    
-  }
-
-  const handleNoteChange = (event) => {
-    console.log(event.target)
-    setNewNote(event.target.value)
-  }
 
   return (
     <div>
@@ -150,15 +126,12 @@ const App = () => {
 
       <Notification message={errorMessage} />
 
-      {user === null ? 
-        loginForm() : 
+      {user === null ? loginForm() : 
         <div>
           <p>{user.name} logged-in</p>
           {noteForm()}
         </div>  
       } 
-
-
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
