@@ -1,9 +1,6 @@
 import { useState } from 'react'
 
 const NoteForm = ({ createNote }) => {
-
-  // We have moved the responsibility of the newNote state variable to the component responsible
-
   const [newNote, setNewNote] = useState('')
 
   const addNote = (event) => {
@@ -21,7 +18,10 @@ const NoteForm = ({ createNote }) => {
       <form onSubmit={addNote}>
         <input
           value={newNote}
-          onChange={event => setNewNote(event.target.value)} />
+          onChange={event => setNewNote(event.target.value)}
+          id='note-input' />
+        <input>
+        </input>
         <button type="submit">save</button>
       </form>
     </div>
