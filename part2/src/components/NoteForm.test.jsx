@@ -9,7 +9,6 @@ test('<NoteForm /> updates parent state and calls on Submit', async () => {
     const { container } = render(<NoteForm createNote={createNote} />) // Render the NoteForm component with the mock function as a prop
     // Note: The container is used to query elements within the rendered component.
 
-
     const input = container.querySelector('#note-input') // Get the input field by its ID (note-input)
     const sendButton = screen.getByText('save') // Get the button by its text (save)
 
