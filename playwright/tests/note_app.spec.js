@@ -1,4 +1,5 @@
 const { test, expect, describe, beforeEach } = require('@playwright/test')
+const { loginWith, createNote } = require('./helper')
 
 
 describe('Note app', () => {
@@ -23,20 +24,12 @@ describe('Note app', () => {
     })
 
     test('user can login with correct credentials', async ({ page }) => {
-        await page.getByRole('button', { name: 'login' }).click()
-        await page.getByTestId('username').fill('root')
-        await page.getByTestId('password').fill('password')
-        await page.getByRole('button', { name: 'login' }).click()
-        await expect(page.getByText('root user logged-in')).toBeVisible()
+        await loginWith(page, 'root', 'password')
         await expect(page.getByText('root user logged-in')).toBeVisible()
     })
 
     test('login fails with wrong password', async ({ page }) => {
-        await page.getByRole('button', { name: 'login' }).click()
-        await page.getByTestId('username').fill('root')
-        await page.getByTestId('password').fill('wrongpassword')
-        await page.getByRole('button', { name: 'login' }).click()
-        
+        await loginWith(page, 'root', 'wrongpassword')
         const errorDiv = await page.locator('.error')
         await expect(errorDiv).toContainText('Wrong credentials')
         await expect(errorDiv).toHaveCSS('border-style', 'solid')
@@ -47,13 +40,10 @@ describe('Note app', () => {
 
     describe('when logged in', () => {
         beforeEach(async ({ page }) => {
-            await page.getByRole('button', { name: 'login' }).click()
-            await page.getByTestId('username').fill('root')
-            await page.getByTestId('password').fill('password')
-            await page.getByRole('button', { name: 'login' }).click()
+            await loginWith(page, 'root', 'password')
         })
 
-        test('a new note can be created', async ({ page}) => {
+        test('a new note can be created', async ({ page }) => {
             await page.getByRole('button', { name: 'new note' }).click()
             await page.getByRole('textbox').fill('a note created by playwright')
             await page.getByRole('button', { name: 'save'}).click()
