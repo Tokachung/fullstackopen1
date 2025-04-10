@@ -68,7 +68,7 @@ notesRouter.put('/:id', async (request, response, next) => {
   }
 
   const updatedNote = await Note.findByIdAndUpdate(request.params.id, note, { new: true })
-  response.json(updatedBlog)
+  response.json(updatedNote)
 })
 
 module.exports = notesRouter
