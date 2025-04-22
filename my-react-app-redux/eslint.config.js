@@ -2,13 +2,13 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import jest from 'eslint-plugin-jest'
 
 export default [
   { ignores: ['dist'] },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
         ecmaVersion: 'latest',
@@ -30,4 +30,19 @@ export default [
       ],
     },
   },
+  {
+    files: ['**/*.test.js', '**/__tests__/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser, // browser stuff like window, document
+        ...jest.environments.globals.globals, // jest stuff like describe, test
+      },
+    },
+    plugins: {
+      jest,
+    },
+    rules: {
+      ...jest.configs.recommended.rules,
+    },
+  }
 ]
