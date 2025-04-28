@@ -1,10 +1,6 @@
 import { createNote, toggleImportanceOf } from './reducers/noteReducer'
 import { useSelector, useDispatch } from 'react-redux'
 
-const generateId = () => {
-  Number((Math.random() * 1000000).toFixed(0))
-}
-
 const App = () => {
   const dispatch = useDispatch()
   const notes = useSelector(state => state)
