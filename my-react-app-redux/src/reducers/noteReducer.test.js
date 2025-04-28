@@ -12,13 +12,13 @@ describe('noteReducer', () => {
         id: 1
       }
     }
-
     deepFreeze(state)
     const newState = noteReducer(state, action)
 
     expect(newState).toHaveLength(1)
     expect(newState).toContainEqual(action.payload)
   })
+  
   test('returns new state with action TOGGLE_IMPORTANCE', () => {
     const state = [
         { 
