@@ -1,33 +1,46 @@
-import { createNote, toggleImportanceOf } from './reducers/noteReducer'
-import { useSelector, useDispatch } from 'react-redux'
-import NewNote from './components/NewNote'
+import { createNote, toggleImportanceOf } from "./reducers/noteReducer";
+import { useSelector, useDispatch } from "react-redux";
+import NewNote from "./components/NewNote";
+import Notes from "./components/Notes";
 
 const App = () => {
-  const filteredSelected = (value) => {
-    console.log(value)
-  }
+	const filteredSelected = (value) => {
+		console.log(value);
+	};
 
+	return (
+		<div>
+			<NewNote />
 
+			<div>
+				all
+				<input
+					type="radio"
+					name="filter"
+					onChange={() => {
+						filteredSelected("ALL");
+					}}
+				/>
+				important
+				<input
+					type="radio"
+					name="filter"
+					onChange={() => {
+						filteredSelected("IMPORTANT");
+					}}
+				/>
+				nonimportant
+				<input
+					type="radio"
+					name="filter"
+					onChange={() => {
+						filteredSelected("NONIMPORTANT");
+					}}
+				/>
+			</div>
+			<Notes />
+		</div>
+	);
+};
 
-  const dispatch = useDispatch()
-  const notes = useSelector(state => state)
-
-  const toggleImportance = (id) => {
-    dispatch(toggleImportanceOf(id))
-  }
-
-  return(
-    <div>
-      <NewNote />
-      <ul>
-        {notes.map(note=>
-          <li key={note.id} onClick={() => toggleImportance(note.id)}>
-            {note.content} <strong>{note.important ? 'important' : ''}</strong>
-          </li>
-        )}
-      </ul>
-    </div>
-  )
-}
-
-export default App
+export default App;
