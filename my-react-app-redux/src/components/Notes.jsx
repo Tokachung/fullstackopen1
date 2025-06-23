@@ -13,7 +13,6 @@ const Notes = () => {
 		: state.notes.filter(note => !note.important)
 	})
 	
-
 	const toggleImportance = (id) => {
 		dispatch(toggleImportanceOf(id));
 	};
