@@ -14,6 +14,11 @@
       "id": "e86f",
       "content": "new note",
       "important": false
+    },
+    {
+      "id": "a3e1",
+      "content": "test",
+      "important": false
     }
   ]
 }
