@@ -1,17 +1,12 @@
-import ReactDOM from 'react-dom/client'
 import { useState } from 'react'
-
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Link,
   Navigate,
-  useParams,
-  useNavigate,
-  useMatch
+  useMatch,
+  useNavigate
 } from "react-router-dom"
-
 
 const Home = () => (
   <div>
@@ -21,6 +16,14 @@ const Home = () => (
 )
 
 const Note = ({ note }) => {
+  if (!note) {
+    return (
+      <div>
+        <h2>Note not found</h2>
+        <p>The note you are looking for does not exist.</p>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -55,12 +58,12 @@ const Users = () => (
   </div>
 )
 
-const Login = (props) => {
+const Login = ({ onLogin }) => {
   const navigate = useNavigate()
 
   const onSubmit = (event) => {
     event.preventDefault()
-    props.onLogin('mluukkai')
+    onLogin('mluukkai')
     navigate('/')
   }
 
@@ -80,8 +83,8 @@ const Login = (props) => {
   )
 }
 
-const App = () => {
-  const [notes, setNotes] = useState([
+export default function App() {
+  const [notes] = useState([
     {
       id: 1,
       content: 'HTML is easy',
@@ -105,23 +108,19 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   const match = useMatch('/notes/:id')
-
   const note = match
-    ? notes.find(note => note.id === Number(match.params.id))
+    ? notes.find(n => n.id === Number(match.params.id))
     : null
-
 
   const login = (user) => {
     setUser(user)
   }
 
-  const padding = {
-    padding: 5
-  }
+  const padding = { padding: 5 }
 
   return (
     <div>
-      <div>
+      <nav>
         <Link style={padding} to="/">home</Link>
         <Link style={padding} to="/notes">notes</Link>
         <Link style={padding} to="/users">users</Link>
@@ -129,20 +128,20 @@ const App = () => {
           ? <em>{user} logged in</em>
           : <Link style={padding} to="/login">login</Link>
         }
-      </div>
+      </nav>
+
       <Routes>
         <Route path="/notes/:id" element={<Note note={note} />} />
         <Route path="/notes" element={<Notes notes={notes} />} />
         <Route path="/users" element={user ? <Users /> : <Navigate replace to="/login" />} />
         <Route path="/login" element={<Login onLogin={login} />} />
         <Route path="/" element={<Home />} />
+        <Route path="*" element={<div><h2>404</h2><p>Not Found</p></div>} />
       </Routes>
-      <div>
-        <br />
+
+      <footer style={{ marginTop: 16 }}>
         <em>Note app, Department of Computer Science 2022</em>
-      </div>
+      </footer>
     </div>
   )
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<Router><App /></Router>)
